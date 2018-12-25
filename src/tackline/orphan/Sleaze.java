@@ -53,7 +53,7 @@ public final class Sleaze {
     *      } else {
     *         throw new IOException();
     *      }
-    *   }); });
+    *   });
     * </pre>
     * 
     * <p>But perhaps {@code unbox()} has a {@code void} return type and no throws clause.
