@@ -42,11 +42,25 @@ public final class Sleaze {
     * Allows returning values and throws (one type of) exception
     *    through a chimney stack
     *    given a void returning, non-throwing interface.
-    * 
-    * Usage something like:
+    *    
+    * <p>Suppose we want to write:
     * <pre>
-    *   Integer result = sleaze(IOException.class, sleaze -> {
-    *      things.unbox(thing -> {
+    *   Integer result = things.unbox(thing -> {
+    *      if (x) {
+    *         return func(); // throws IOException
+    *      } else if (y) {
+    *         return 42;
+    *      } else {
+    *         throw new IOException();
+    *      }
+    *   }); });
+    * </pre>
+    * 
+    * <p>But perhaps {@code unbox()} has a {@code void} return type and no throws clause.
+    * Oh no.
+    * But with Sleaze we can write something like:
+    * <pre>
+    *   Integer result = sleaze(IOException.class, sleaze -> { things.unbox(thing -> {
     *      if (x) {
     *         sleaze.of(() -> func());
     *      } else if (y) {
@@ -54,9 +68,22 @@ public final class Sleaze {
     *      } else {
     *         sleaze.throw_(new IOException());
     *      }
-    *      });
-    *   });
+    *   }); });
     * </pre>
+    * 
+    * <p>I guess you could also write:
+    * <pre>
+    *   Integer result = sleaze(IOException.class, sleaze -> { things.unbox(thing -> { sleaze.of(() -> {
+    *      if (x) {
+    *         return func(); // throws IOException
+    *      } else if (y) {
+    *         return 42;
+    *      } else {
+    *         throw new IOException();
+    *      }
+    *   }); }); });
+    * </pre>
+    * If you wanted.
     */
    public static <R, EXC extends Throwable> R sleaze(Class<EXC> excClass, Sleazy<R, EXC> sleazy) throws EXC {
       class SleazerImpl implements Sleazer<R, EXC> {
